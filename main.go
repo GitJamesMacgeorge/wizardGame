@@ -2,58 +2,22 @@ package main
 
 import (
     "log"
-    //"fmt"
+    "fmt"
     "github.com/hajimehoshi/ebiten/v2"
     // "github.com/hajimehoshi/ebiten/v2/ebitenutil"
-    "image/color"
+  "image"
+   // "image/color"
+    "image/png"
+    "os"
 )
 
 type Game struct{
   player Player
 }
 
-type Entity interface {
-  MoveUp()
-  MoveDown()
-  MoveRight()
-  MoveLeft()
-}
-
 type Player struct {
   x, y float64
   width, height int
-}
-
-func (p *Player) MoveUp() {
-  p.y -= 2
-}
-
-func MoveUp(e Entity) {
-  e.MoveUp()
-}
-
-func (p *Player) MoveDown() {
-  p.y += 2
-}
-
-func MoveDown(e Entity) {
-  e.MoveDown()
-}
-
-func (p *Player) MoveRight() {
-  p.x += 2
-}
-
-func MoveRight(e Entity) {
-  e.MoveRight()
-}
-
-func (p *Player) MoveLeft() {
-  p.x -= 2
-}
-
-func MoveLeft(e Entity) {
-  e.MoveLeft()
 }
 
 func (g *Game) Update() error {
@@ -81,8 +45,24 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-  myImg := ebiten.NewImage(g.player.width, g.player.height)
-  myImg.Fill(color.RGBA{200, 0, 0, 200})
+
+  // Create Wizard image
+  wizard_img_file, err := os.Open("resources/wizard.png")
+
+  if err != nil {
+    fmt.Println(err) 
+  }
+  img_png, err := png.Decode(wizard_img_file)
+  if err != nil {
+    fmt.Println(err)
+  }
+  newImg := ebiten.NewImageFromImage(img_png)
+
+  subImgRect := image.Rect(0, 0, 16, 16)
+  myImg := newImg.SubImage(subImgRect).(*ebiten.Image)
+
+ //  myImg := ebiten.NewImage(g.player.width, g.player.height)
+  //myImg.Fill(color.RGBA{200, 0, 0, 200})
   op := &ebiten.DrawImageOptions{}
   op.GeoM.Translate(g.player.x, g.player.y)
   screen.DrawImage(myImg, op)
